@@ -7,13 +7,13 @@ SW는 한번 작성되면 최소 10번 이상 읽힌다.
 기계가 이해할 수 있는 코드는 누구나 만들 수 있지만, 인간이 이해할 수 있는 코드는 짜기 힘들다.
 
 
-## 1. [OOP](./OOP.md)
+### 1. [OOP](./OOP.md)
 
-## 2. [Functions](./Functions.md)
+### 2. [Functions](./Functions.md)
 
-## 3. [Function Structure](./Function-Structure.md)
+### 3. [Function Structure](./Function-Structure.md)
 
-## 4. [Forms](./Forms.md)
+### 4. [Forms](./Forms.md)
 
-## 5. [TDD](./TDD.md)
+### 5. [TDD](./TDD.md)
 
