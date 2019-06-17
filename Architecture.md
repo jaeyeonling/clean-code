@@ -1,59 +1,135 @@
-# TDD
+# Architecture
 
-## The Three Laws of TDD
+## What is Architecture
 
-### Write NO production code except to pass a failing test
+### 전체적인 시스템 개발에 기반을 제공하는 변경 불가능한 초기 결정사항의 집합
 
-### Write only ENOUGH of a test to demonstrate a failure
+* Set of irrevocable early decisions that raised the foundation for the entire system development
+  * Java: Language
+  * IntelliJ: Development Environment
+  * Spring: Framework
+  * MySQL, MVC
 
-### Write only ENOUGH production code to pass the test
+### 건축의 아키텍처가 해머, 못 등이 아니듯
 
-
-
-## TDD 절차
-
-### start
-
-### write a failing test (red)
-
-### write code to make it pass (green)
-
-### refactor (blue)
-
-* mandatory 
-* not optional
-
-### stop
-
-* can't think of any more tests
+### 툴, Building Material 등이 아니라 사용법(Usage)에 대한 것
 
 
 
-## 원칙 & 팁
+## What is Use Case
 
-### most simple / degeneraate test case first
+### a list of steps, typically defining interactions between a role(actor) and a system, to achieve a goal
 
-### little golf game
+### 게시글 작성하기
 
-### As the tests get more specific, the code gets more generic
+* 사용자
+  * 제목을 입력한다.
+  * 본문을 입력한다.
+  * 글 작성하기를 요청한다.
+* 시스템
+  * 제목의 유효성을 조사한다.
+  * 본문의 유효성을 조사한다.
+  * 글을 저장한다.
 
 
 
-## TDD의 잇점
+## Architecture Exposes Usage
 
-### Debugging Time
+### 아키텍처는 사용법에 대해서 설명
 
-* Champion Debugger가 되고 싶은가?
-* 이건 요구되는 스킬이 아니다.
-  * 디버깅에 시간을 보내길 원치 않는다.
-  * 코드가 동작하도록 하는데 시간을 사용하길 바란다.
-* TDD가 디버깅 시간을 1/10로 줄여 줄 것이다.
-* 그런데 1/10이 아니라 1/2만 줄여도 의미가 있다.
+### MVC 구조만 있는 웹시스템
 
-### Design Documents
+* Use case를 숨기고 Delivering 메커니즘만 노출
+* 중요한 것은 Delivering 메커니즘이 아니라 Use case
+* Use case는 Delivering 메커니즘에 decoupled 돼야 한다.
+* UI, DB, F/W, Tools 등에 대한 결정들이 Use case와는 완전히 decouple 되어야 한다.
+
+### Use case should stand alone
+
+
+
+## Deferring Decisions
+
+### 좋은 아키텍처는 FW, WAS, UI 등과 같은 stuff들에 대한 결정을 연기하는 것을 허용
+
+* stuff에 대한 결정은 연기될 수 있어야 한다.
+* 연기되어야만 한다.
+* 이게 좋은 아키텍처의 주요한 목적 중 하나
+
+### 시간이 지날수록 결정을 위한 정보가 풍부해진다.
 
 * TDD의 3가지 법칙을 잘 따르면 설계 문서를 얻게된다.
 * test는 low level design document이다.
+
+### EX) Fitness
+
+* 위키 저장을 위해 MySQL을 생각
+* 무언가를 하기 전에 DB를 먼저 기동하고 스키마를 개발해야 한다고 생각
+* 하지만, 사실 이게 바로 필요하진 않다.
+* 위키 텍스트를 html로 변환하는 것에 초점을 둬야한다.
+  * 파싱, 번역하는 코드는 DB 없이도 개발할 수 있다.
+* WikiPage라는 중요한 추상화
+  * wiki text를 가진다.
+  * toHtml: wiki text를 html로 parse
+  * save: wiki text를 DB에 저장
+* 하나 이상의 페이지를 사용해야 하는 경우 발생
+  * DB가 실제로 필요한 상황
+* InMemoryPage Test Double 
+  * 당분간은 DB 사용을 피할 수 있다는 것을 알았다.
+  * WikiPage abstraction에 대한 새로운 서브 클래스를 생성함으로써, 메모리의 해쉬 테이블에 위키 페이지를 관리하는 클래스를 만들 수 있다.
+  * 이러한 서브 클래스들을 Test Double이라고 한다.
+  * Test Double을 이용해서 시스템에서 필요한 모든 기능을 구현할 수 있다. (페이지를 디스크에 저장하는 것을 제외)
+* 결국에는 Persistence 없이는 구현할 수 없어졌다.
+  * 생각해 낼 수 있는 새로운 테스트는 항상 DB가 필요하다.
+  * DB를 기동하고, 스키마를 만들고, DB에 위키 페이지를 저장하고 읽는 기능을 구현
+* FileSystemPage Test Double
+  * 복잡하지 않게 DB가 있는 것과 같은 환상을 일으키는 테스트를 만들 수 있다.
+  * 이 테스트 대역은 DB 구현 없이 DB가 필요한 기능도 만족시켰다.
+  * 이 테스트 대역이 위키 페이지를 flat file에 저장한다.
+* 주요한 아키텍처 결정을 연기했다.
+  * 실제 DB를 사용 안했다.
+  * 더 간단하고 충분히 좋은 해결책이 있기 떄문에.
+* 최종적으로는 고객사에서 모든 데이터는 실제 DB에 넣아야 한다는 정책이 있어서 그렇게 구현한다.
+  * DatabasePage 추가
+
+
+
+## Central Abstraction
+
+### 많은 아키텍트는 DB를 core abstraction이라고 생각한다.
+
+* DB가 동작하고 스키마가 준비되기 전에는 어떠한 생각도, 작업도 하지 않는다.
+
+### Fitness 프로젝트의 Central Abstraction - WikiPage
+
+* DB를 연기할 수 있는 Detail로 간주한다.
+* 좋은 아키텍처는 Tool, FW로 구성되는 것이 아니다.
+* 좋은 아키텍처는 UI, WAS, DI FW 등과 같은 Detail에 대한 결정을 연기할 수 있도록 해준다.
+
+### 어떻게 하면 이렇게 연기할 수 있나?
+
+* 연기하고 싶은 것에서 구조를 decouple, irrelevant하게 설계한다.
+
+### 어떻게 하면 Tool, FWs, DB에서 decouple 할 수 있을까?
+
+* 아키텍처 측면에서 SW 환경이 아닌 Use case에 집중하라.
+
+
+
+## Conclusion
+
+### 아키텍처를 Use case에 집중
+
+* UI, FWs, WAS, DB 등과 같은 다른 시스템 컴포넌트에 대한 결정을 미룰 수 있다.
+* 이러한 연기는 우리의 선택을 최대한 오래 열어 둘 수 있다.
+* 이말은 필요에 따라 결정을 변경할 수 있다는 것이다.
+* 프로젝트 진행 중에 충분한 정보가 생김에 따라 undo에 대한 비용 없이 여러번 변경할 수도 있다.
+
+
+
+
+
+
 
 ### Decoupling
 
